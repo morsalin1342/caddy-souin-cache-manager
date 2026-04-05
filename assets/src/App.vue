@@ -89,7 +89,7 @@
     </header>
 
     <!-- Main Content -->
-    <main class="tw:w-full tw:mx-auto tw:p-6 tw:md:p-8">
+    <main class="tw:w-full tw:mx-auto tw:p-6 tw:md:p-8 tw:mt-8">
 
       <!-- Cache Keys View -->
       <div v-if="currentPage === 'keys'" class="tw:grid tw:grid-cols-1 tw:lg:grid-cols-12 tw:gap-8 tw:animate-in tw:fade-in tw:slide-in-from-bottom-2 tw:duration-500">
@@ -292,11 +292,6 @@
       </div>
     </main>
 
-    <footer class="tw:w-full tw:mx-auto tw:pb-12 tw:text-center">
-      <p class="tw:text-slate-300 tw:text-[9px] tw:font-bold tw:uppercase tw:tracking-widest">
-        Morsalin v1.8.13 &bull; Global Performance
-      </p>
-    </footer>
   </div>
 </template>
 
@@ -505,29 +500,50 @@ const testRedisConnection = async () => {
   }
 };
 
+const adjustHeaderPosition = () => {
+  const adminBar = document.getElementById('wpadminbar');
+  const notices = document.querySelectorAll('.wrap > .notice, .wrap > div.error, .wrap > div.updated');
+  let totalOffset = adminBar ? adminBar.offsetHeight : 0;
+
+  notices.forEach(notice => {
+    totalOffset += notice.offsetHeight;
+  });
+
+  const header = document.querySelector('#cscm-plugin-container > header');
+  if (header) {
+    header.style.top = `${totalOffset}px`;
+  }
+};
+
 onMounted(() => {
-  if (currentPage === 'keys') fetchKeys();
+  if (currentPage.value === 'keys') fetchKeys();
   fetchSettings();
+
+  // Adjust header on load and on window resize
+  adjustHeaderPosition();
+  window.addEventListener('resize', adjustHeaderPosition);
+
+  // Use a ResizeObserver to watch for changes in the wrap element, which will
+  // fire when notices are added or dismissed.
+  const wrapElement = document.querySelector('.wrap');
+  if (wrapElement) {
+    const observer = new ResizeObserver(adjustHeaderPosition);
+    observer.observe(wrapElement);
+  }
 });
 </script>
 
 <style>
+/* Remove the hardcoded top value for the header */
+#cscm-plugin-container > header {
+  position: sticky;
+  z-index: 50;
+}
+
 .toast-enter-active, .toast-leave-active { transition: all 0.4s ease; }
 .toast-enter-from { opacity: 0; transform: translateY(-20px); }
 .toast-leave-to { opacity: 0; transform: scale(0.95); }
 
 @keyframes shrink { from { width: 100%; } to { width: 0%; } }
 .tw\:animate-shrink { animation: shrink 5s linear forwards; }
-
-/* No custom scrollbar styling - using default browser scrollbar */
-
-/* Header sticky offset for WP Admin bar */
-header {
-  top: 32px; /* Standard WP Admin bar height */
-}
-@media screen and (max-width: 782px) {
-  header {
-    top: 46px; /* WP Admin bar height on smaller screens */
-  }
-}
 </style>

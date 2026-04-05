@@ -3,7 +3,7 @@
  * Plugin Name: Caddy Souin Cache Manager
  * Plugin URI:  https://github.com/morsalin1342/caddy-souin-cache-manager
  * Description: Manage Souin cache for Caddy server within WP Admin. View cache keys and purge cache.
-  * Version:     1.8.13
+  * Version:     1.8.14
  * Requires PHP: 8.1
  * Author:      MD Morsalin
  * Author URI:  https://morsalin.online

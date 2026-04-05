@@ -1,6 +1,6 @@
 # Caddy Souin Cache Manager for WordPress
 
-![Stable tag](https://img.shields.io/badge/stable_tag-1.8.13-blue)
+![Stable tag](https://img.shields.io/badge/stable_tag-1.8.14-blue)
 ![License](https://img.shields.io/badge/license-GPLv2_or_later-blue)
 ![Requires PHP](https://img.shields.io/badge/php-8.1+-blue)
 ![WordPress Tested up to](https://img.shields.io/badge/WordPress-6.5-blue)
@@ -171,6 +171,10 @@ Yes. All purge actions are protected with WordPress nonces and require the `mana
 Yes. The plugin sends the literal, unmodified cache key for all manual purge operations, making it compatible with any key structure Souin might use. The automatic purge feature uses a broad regex pattern to ensure all variants of a URL are purged.
 
 ## Changelog
+
+### 1.8.14
+*   **Fix**: Implemented a dynamic header positioning script to prevent the sticky header from overlapping with WordPress admin notices.
+*   **Fix**: Removed the footer credit line and added vertical margin to the main content area for better spacing.
 
 ### 1.8.13
 *   Complete architecture refactor.
