@@ -1,0 +1,12 @@
+@import "tailwindcss" prefix(tw);
+
+@source "./**/*.vue";
+
+@theme {
+  --animate-shrink: shrink 5s linear forwards;
+  
+  @keyframes shrink {
+    from { width: 100%; }
+    to { width: 0%; }
+  }
+}

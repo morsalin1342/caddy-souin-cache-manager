@@ -1,0 +1,51 @@
+name: Create Plugin Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.1'
+          extensions: mbstring, dom, xml, xmlwriter, curl, zip, json
+          coverage: none
+
+      - name: Install Composer dependencies
+        run: composer install --no-dev --prefer-dist --optimize-autoloader
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Install Node.js dependencies
+        run: npm install
+
+      - name: Build frontend assets
+        run: npm run build
+
+      - name: Create plugin archive
+        run: |
+          mkdir caddy-souin-cache-manager
+          rsync -av --progress . caddy-souin-cache-manager --exclude .git --exclude .github --exclude node_modules --exclude assets/src --exclude .idea --exclude *.bak --exclude *.zip
+          zip -r caddy-souin-cache-manager.zip caddy-souin-cache-manager
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: caddy-souin-cache-manager.zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

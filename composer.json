@@ -1,0 +1,35 @@
+{
+    "name": "morsalin1342/caddy-souin-cache-manager",
+    "description": "Manage Souin cache for Caddy server within WP Admin. View cache keys and purge cache.",
+    "type": "wordpress-plugin",
+    "license": "GPL-2.0-or-later",
+        "version": "1.8.13",
+    "authors": [
+        {
+            "name": "MD Morsalin",
+            "email": "contact@morsalin.online"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "morsalin1342\\CaddySouinCacheManager\\": "src/",
+            "Tests\\": "tests/"
+        }
+    },
+    "require": {
+        "ext-dom": "*",
+        "ext-mbstring": "*",
+        "ext-xml": "*",
+        "ext-xmlwriter": "*",
+        "predis/predis": "^3.4"
+    },
+    "require-dev": {
+    },
+    "scripts": {
+    },
+    "config": {
+        "allow-plugins": {
+            "alleyinteractive/composer-wordpress-autoloader": true
+        }
+    }
+}

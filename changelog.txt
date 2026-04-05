@@ -1,0 +1,75 @@
+=== Caddy Souin Cache Manager ===
+Contributors: morsalin1342
+Tags: caddy, souin, cache, purge, performance
+Requires at least: 5.8
+Tested up to: 6.5
+Requires PHP: 8.1
+Stable tag: 1.8.13
+License: GPLv2 or later
+License URI: https://www.gnu.org/licenses/gpl-2.0.html
+
+A simple yet powerful plugin to manage the Souin cache for your Caddy web server directly from your WordPress admin dashboard.
+
+== Description ==
+
+The Caddy Souin Cache Manager plugin provides a seamless integration between your WordPress site and your Caddy server's Souin caching layer. It empowers you to take full control of your site's cache without ever leaving the WordPress admin area.
+
+No more command-line access needed for routine cache management. The plugin provides a clean and intuitive interface to view all cached items, purge the entire cache, or selectively clear items by key, selection, or regular expression.
+
+It also features intelligent automatic purging, which clears the cache for posts, pages, and the homepage whenever your content is updated, ensuring your visitors always see the latest version of your site.
+
+*   **View Cache Keys:** See all Souin cache keys directly in your WP Admin dashboard.
+*   **One-Click Full Purge:** Clear the entire cache with a single click.
+*   **Selective Purging:** Purge individual cache items, bulk purge selected items, or purge by a flexible regular expression.
+*   **Multiple Backends:** Connect to the Souin cache via the HTTP API or directly to a Redis backend.
+*   **Automatic Cache Invalidation:** Automatically purges the cache for posts, pages, or comments when they are created, updated, or deleted.
+*   **WP-CLI Integration:** A full suite of `wp souin` commands for power users and automation.
+
+== Installation ==
+
+1.  Upload the `caddy-souin-cache-manager` folder to your `/wp-content/plugins/` directory.
+2.  Activate the plugin through the **Plugins** menu in WordPress.
+3.  Navigate to **Tools > Souin Cache**.
+4.  In the settings section, enter your **Souin API URL** and click **Save Settings**.
+
+== Frequently Asked Questions ==
+
+= How do I find my Souin API URL? =
+
+Your Souin API URL is defined in your `Caddyfile`. The API is part of Caddy's admin endpoint, which is configured in the global options at the top of your `Caddyfile`. The Souin-specific path is then configured within the `souin` directive.
+
+**Example `Caddyfile`:**
+`
+# Global options - defines the admin API port
+{
+    admin :2019
+}
+
+# Site configuration
+example.com {
+    # Other directives...
+    
+    # Souin configuration
+    souin {
+        # Enable the Souin API and set its base path
+        api {
+            basepath /souin-api
+        }
+    }
+    
+    # Other directives...
+}
+`
+Based on this example, the full API URL would be: `https://127.0.0.1:2019/souin-api/souin`.
+
+= Is this plugin secure? =
+
+Yes. All purge actions are protected with WordPress nonces and require the `manage_options` user capability, which is typically reserved for Administrators.
+
+== Changelog ==
+
+= 1.8.13 =
+* Complete architecture refactor.
+* New Vue.js powered admin interface.
+* Tailwind CSS v4 integration.
+* REST API support.
