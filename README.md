@@ -49,7 +49,7 @@ It also features intelligent automatic purging, which clears the cache for posts
 2.  In the settings section, enter your **Souin API URL**.
 3.  Click **Save Settings**.
 
-By default, the URL is set to `https://127.0.0.1:2019/souin-api/souin`, which is a common default for local Caddy instances. Adjust the protocol, domain, port, and base path to match your server's Caddy and Souin configuration.
+By default, the URL is set to `http://127.0.0.1:2019/souin-api/souin`, which is a common default for local Caddy instances. Adjust the protocol, domain, port, and base path to match your server's Caddy and Souin configuration.
 
 ## Usage
 
@@ -70,7 +70,7 @@ $ wp souin status
 +-------------------+------------------------------------------+
 | Key               | Value                                    |
 +-------------------+------------------------------------------+
-| Souin API URL     | https://127.0.0.1:2019/souin-api/souin     |
+| Souin API URL     | http://127.0.0.1:2019/souin-api/souin      |
 | Auto Purge        | Enabled                                  |
 | API Connection    | Connection successful! Found 42 keys.    |
 +-------------------+------------------------------------------+
@@ -160,7 +160,7 @@ Based on the example above:
 *   The Souin API base path is `/souin-api`.
 *   The final part of the path is always `/souin`.
 
-Therefore, the full API URL for the plugin would be: `https://127.0.0.1:2019/souin-api/souin`. Remember to replace `127.0.0.1` with your server's domain or IP if Caddy is not running on the same machine as WordPress.
+Therefore, the full API URL for the plugin would be: `http://127.0.0.1:2019/souin-api/souin`. Remember to replace `127.0.0.1` with your server's domain or IP if Caddy is not running on the same machine as WordPress.
 
 **Is this plugin secure?**
 
@@ -185,3 +185,7 @@ Yes. The plugin sends the literal, unmodified cache key for all manual purge ope
 ## License
 
 This plugin is licensed under the GPLv2 or later. See the [license.txt](license.txt) file for more details.
+
+---
+
+⭐ **If this plugin helps you, consider giving it a star!**

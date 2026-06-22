@@ -60,13 +60,17 @@ example.com {
     # Other directives...
 }
 `
-Based on this example, the full API URL would be: `https://127.0.0.1:2019/souin-api/souin`.
+Based on this example, the full API URL would be: `http://127.0.0.1:2019/souin-api/souin`.
 
 = Is this plugin secure? =
 
 Yes. All purge actions are protected with WordPress nonces and require the `manage_options` user capability, which is typically reserved for Administrators.
 
 == Changelog ==
+
+= 1.8.14 =
+* Fixed sticky header spacing in admin interface.
+* Fixed footer spacing in admin interface.
 
 = 1.8.13 =
 * Complete architecture refactor.

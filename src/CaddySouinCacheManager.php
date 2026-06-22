@@ -26,7 +26,7 @@ class CaddySouinCacheManager {
 		$this->default_api_url = 'http://127.0.0.1:2019/souin-api/souin';
 		$this->main_page_slug  = 'cscm-cache-keys';
 		$this->settings_slug   = 'cscm-settings';
-				$this->version         = '1.8.13';
+				$this->version         = '1.8.14';
 	}
 
 	public function init(): void {

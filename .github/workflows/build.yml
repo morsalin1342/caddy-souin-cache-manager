@@ -13,7 +13,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Set up PHP
         uses: shivammathur/setup-php@v2
@@ -26,10 +26,11 @@ jobs:
         run: composer install --no-dev --prefer-dist --optimize-autoloader
 
       - name: Set up Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: '22'
           cache: 'npm'
+          cache-dependency-path: package-lock.json
 
       - name: Install Node.js dependencies
         run: npm install
@@ -44,7 +45,7 @@ jobs:
           zip -r caddy-souin-cache-manager.zip caddy-souin-cache-manager
 
       - name: Create GitHub Release
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v2
         with:
           files: caddy-souin-cache-manager.zip
         env:
