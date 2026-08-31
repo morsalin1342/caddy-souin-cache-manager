@@ -57,7 +57,7 @@ It also features intelligent automatic purging, which clears the cache for posts
 
 ## Configuration
 
-1.  In your WordPress admin dashboard, navigate to **Tools > Souin Cache**.
+1.  In your WordPress admin dashboard, navigate to **Souin Cache > Settings**.
 2.  In the settings section, enter your **Souin API URL**.
 3.  Click **Save Settings**.
 
@@ -67,7 +67,7 @@ By default, the URL is set to `http://127.0.0.1:2019/souin-api/souin`, which is 
 
 ### WordPress Dashboard
 
-All UI-based cache management is done from the **Tools > Souin Cache** screen. Here, you will find a list of all cached keys and options to purge them.
+All UI-based cache management is done from the **Souin Cache > Cache Keys** screen. Here, you will find a list of all cached keys and options to purge them.
 
 ### WP-CLI Commands
 

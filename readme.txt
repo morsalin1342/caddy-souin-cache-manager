@@ -28,22 +28,31 @@ The Caddy Souin Cache Manager plugin provides seamless integration between your 
 
 1. Upload the plugin files to `/wp-content/plugins/caddy-souin-cache-manager/`
 2. Activate the plugin through the 'Plugins' menu in WordPress
-3. Go to Settings → Caddy Souin Cache to configure your Souin API URL
+3. Go to Souin Cache → Settings to configure your Souin API URL
 
 == Configuration ==
 
 The Souin API must be enabled in your Caddyfile. Add to your Caddy config:
 
 ```
+# Global options - defines the admin API port
 {
-    admin 127.0.0.1:2019
-    cache {
+    admin :2019
+}
+
+# Site configuration
+example.com {
+    souin {
         api {
-            souin
+            basepath /souin-api
         }
     }
 }
 ```
+
+With the example above the plugin's API URL is
+`http://127.0.0.1:2019/souin-api/souin` - the admin port, the base path, then
+`/souin`.
 
 == Changelog ==
 
