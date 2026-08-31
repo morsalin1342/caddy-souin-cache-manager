@@ -1,11 +1,23 @@
 # Caddy Souin Cache Manager for WordPress
 
-![Stable tag](https://img.shields.io/badge/stable_tag-1.8.14-blue)
-![License](https://img.shields.io/badge/license-GPLv2_or_later-blue)
-![Requires PHP](https://img.shields.io/badge/php-8.1+-blue)
-![WordPress Tested up to](https://img.shields.io/badge/WordPress-6.5-blue)
+[![Release](https://img.shields.io/github/v/release/morsalin1342/caddy-souin-cache-manager?style=for-the-badge&logo=github)](https://github.com/morsalin1342/caddy-souin-cache-manager/releases)
+[![GitHub Stars](https://img.shields.io/github/stars/morsalin1342/caddy-souin-cache-manager?style=for-the-badge&logo=github)](https://github.com/morsalin1342/caddy-souin-cache-manager)
+[![License](https://img.shields.io/badge/license-GPLv2%20or%20later-blue?style=for-the-badge)](license.txt)
+[![Requires PHP](https://img.shields.io/badge/php-8.1%2B-blue?style=for-the-badge&logo=php)](https://www.php.net/)
+[![WordPress](https://img.shields.io/badge/WordPress-5.8%2B-blue?style=for-the-badge&logo=wordpress)](https://wordpress.org/)
 
 A simple yet powerful plugin to manage the Souin cache for your Caddy web server directly from your WordPress admin dashboard.
+
+## ✨ Why This Plugin?
+
+| Task | Without it | With it |
+|------|-----------|---------|
+| **See what is cached** | `curl` the Souin API and read raw JSON | ✅ Browsable key list in WP Admin |
+| **Purge one entry** | Hand-built API call with the exact key | ✅ One click, or `wp souin purge-key` |
+| **Purge by pattern** | ❌ Not practical by hand | ✅ Regex purge |
+| **Invalidate on content change** | ❌ Manual, every time | ✅ Automatic on post, page and comment changes |
+| **Redis backend** | Separate tooling | ✅ Direct connection |
+| **Automation / CI** | Shell scripts around `curl` | ✅ Full `wp souin` command suite |
 
 ## Description
 
@@ -126,7 +138,7 @@ Purges all cache keys that match a given regular expression pattern. The pattern
 $ wp souin purge-regex ".*\/product\/cool-widget\/.*"
 ```
 
-## Frequently Asked Questions
+## ❓ FAQ
 
 **How do I find my Souin API URL?**
 
