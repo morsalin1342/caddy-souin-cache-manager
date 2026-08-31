@@ -50,8 +50,12 @@ It also features intelligent automatic purging, which clears the cache for posts
 
 ## Installation
 
-1.  Download the latest release from the WordPress.org plugin repository.
-2.  Upload the `caddy-souin-cache-manager` folder to your `/wp-content/plugins/` directory.
+The plugin is not on the WordPress.org plugin directory. Install it from the GitHub
+releases instead:
+
+1.  Download `caddy-souin-cache-manager.zip` from the [latest release](https://github.com/morsalin1342/caddy-souin-cache-manager/releases/latest).
+2.  In WP Admin go to **Plugins > Add New > Upload Plugin**, choose the zip and click
+    **Install Now** — or extract it into `/wp-content/plugins/` yourself.
 3.  Activate the plugin through the **Plugins** menu in WordPress.
 4.  Proceed to the configuration steps below.
 
