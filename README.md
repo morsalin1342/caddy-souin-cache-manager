@@ -182,10 +182,33 @@ Yes. The plugin sends the literal, unmodified cache key for all manual purge ope
 *   Tailwind CSS v4 integration.
 *   REST API support.
 
+## Related Images & Tools
+
+This plugin manages the **Souin** cache, which ships in these two images. Either one gives you
+a Caddy with Souin already compiled in, so the only setup left is enabling the API in your
+Caddyfile.
+
+| Repository | Images | Description |
+|---|---|---|
+| [caddy-docker](https://github.com/morsalin1342/caddy-docker) | `morsalin1342/caddy` · `easydigital/caddy` | Standalone Caddy — Souin with Redis, Otter and SimpleFS backends |
+| [frankenphp-docker](https://github.com/morsalin1342/frankenphp-docker) | `morsalin1342/frankenphp` · `easydigital/frankenphp` | Caddy + PHP app server, same Souin stack compiled in |
+
+Also in this family, though neither ships Souin:
+[php-docker](https://github.com/morsalin1342/php-docker) (PHP-FPM & CLI) and
+[nginx-docker](https://github.com/morsalin1342/nginx-docker) (nginx with ModSecurity 3, Brotli and GeoIP2).
+
+---
+
+## Feedback and Issues
+
+If you have suggestions, find a bug, or want to request a feature, please [open an issue](https://github.com/morsalin1342/caddy-souin-cache-manager/issues) on the GitHub repository.
+
+---
+
 ## License
 
 This plugin is licensed under the GPLv2 or later. See the [license.txt](license.txt) file for more details.
 
 ---
 
-⭐ **If this plugin helps you, consider giving it a star!**
+⭐ **If this project helps you, consider giving it a star!**
