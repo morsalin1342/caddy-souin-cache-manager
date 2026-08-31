@@ -1,5 +1,3 @@
-Here is the text of the GNU General Public License, version 2, as required by the plugin's license declaration.
-
 		    GNU GENERAL PUBLIC LICENSE
 		       Version 2, June 1991
 
