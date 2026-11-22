@@ -43,6 +43,14 @@ class CaddySouinCacheManagerCli {
 
 	/**
 	 * Lists all keys currently in the Souin cache.
+	 *
+	 * ## OPTIONS
+	 *
+	 * [--format=<format>]
+	 * : Output format: table, json, csv, yaml or count.
+	 * ---
+	 * default: table
+	 * ---
 	 */
 	public function list( $args, $assoc_args ): void {
 		$keys = $this->api->get_keys();
@@ -66,6 +74,13 @@ class CaddySouinCacheManagerCli {
 
 	/**
 	 * Purges the entire Souin cache.
+	 *
+	 * ## OPTIONS
+	 *
+	 * [--yes]
+	 * : Skip the confirmation prompt.
+	 *
+	 * @subcommand purge-all
 	 */
 	public function purge_all( $args, $assoc_args ): void {
 		WP_CLI::confirm( "Are you sure you want to purge the entire cache?" );
@@ -81,6 +96,13 @@ class CaddySouinCacheManagerCli {
 
 	/**
 	 * Purges one or more specific keys from the Souin cache.
+	 *
+	 * ## OPTIONS
+	 *
+	 * <key>...
+	 * : One or more cache keys, exactly as `wp souin list` shows them.
+	 *
+	 * @subcommand purge-key
 	 */
 	public function purge_key( $args, $assoc_args ): void {
 		if ( empty( $args ) ) {
@@ -113,6 +135,14 @@ class CaddySouinCacheManagerCli {
 
 	/**
 	 * Purges keys from the Souin cache that match a regex pattern.
+	 *
+	 * ## OPTIONS
+	 *
+	 * <pattern>
+	 * : A regular expression. Character classes ([...]), {n} and | cannot be
+	 * sent to the Souin API; use . to match any one character.
+	 *
+	 * @subcommand purge-regex
 	 */
 	public function purge_regex( $args, $assoc_args ): void {
 		if ( empty( $args[0] ) ) {
