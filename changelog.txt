@@ -2,6 +2,19 @@
 
 This file is the only changelog. readme.txt and README.md link here.
 
+= 1.8.15 =
+* Fix: automatic purge did nothing. The escaped pattern it sent was percent-encoded on the way to Souin, which does not decode it.
+* Fix: unpublishing a post (to draft, pending or private), trashing it or deleting it now purges its cached page, using the URL it had while published. The feed, archives and home pagination are purged too, once per request.
+* Fix: purging a listed key from the admin or with wp souin purge-key did nothing for keys with a {-VARY-} part.
+* Fix: the documented purge-all, purge-key and purge-regex WP-CLI commands were registered as purge_all and so on.
+* Fix: the cache keys page loads its keys when it opens.
+* Security: the Redis password is no longer sent to the browser, and is stored as typed instead of through sanitize_text_field().
+* Security: npm dependencies updated; the unused axios dependency is removed.
+* Change: wp souin status tests the Souin API connection and exits with status 1 when it fails.
+* Change: an unknown purge type or a regex that cannot be sent to Souin is a 400 error instead of a silent success.
+* Change: an admin notice explains when vendor/ is missing.
+* Dev: unit tests (PHPUnit, Brain Monkey), an end-to-end test (WordPress, MariaDB, Caddy/Souin in Docker) and CI.
+
 = 1.8.14 =
 * Fix: a dynamic header positioning script stops the sticky header from overlapping WordPress admin notices.
 * Fix: removed the footer credit line and added vertical margin to the main content area.

@@ -4,7 +4,7 @@ Tags: caddy, souin, cache, purge, http-cache
 Requires at least: 5.8
 Tested up to: 7.1
 Requires PHP: 8.1
-Stable tag: 1.8.14
+Stable tag: 1.8.15
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 

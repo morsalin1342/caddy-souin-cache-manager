@@ -3,7 +3,7 @@
     "description": "Manage Souin cache for Caddy server within WP Admin. View cache keys and purge cache.",
     "type": "wordpress-plugin",
     "license": "GPL-2.0-or-later",
-    "version": "1.8.14",
+    "version": "1.8.15",
     "authors": [
         {
             "name": "MD Morsalin",
