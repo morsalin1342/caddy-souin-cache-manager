@@ -17,6 +17,18 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 if ( ! file_exists( __DIR__ . '/vendor/autoload.php' ) ) {
+	// Installed from a source checkout rather than a release zip: say so
+	// instead of silently doing nothing.
+	add_action( 'admin_notices', static function () {
+		if ( ! current_user_can( 'activate_plugins' ) ) {
+			return;
+		}
+		printf(
+			'<div class="notice notice-error"><p>%s</p></div>',
+			esc_html__( 'Caddy Souin Cache Manager is not running: its vendor/ directory is missing. Install the release zip, or run "composer install --no-dev" in the plugin directory.', 'caddy-souin-cache-manager' )
+		);
+	} );
+
 	return;
 }
 
