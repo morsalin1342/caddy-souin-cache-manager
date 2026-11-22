@@ -1,0 +1,50 @@
+# End-to-end test stack: WordPress + MariaDB behind Caddy with the Souin
+# cache handler. Started and driven by run.sh; see CONTRIBUTING.md.
+name: cscm-e2e
+services:
+  db:
+    image: mariadb:${MARIADB_TAG:-12.3}
+    environment:
+      MARIADB_DATABASE: wp
+      MARIADB_USER: wp
+      MARIADB_PASSWORD: wp
+      MARIADB_ROOT_PASSWORD: root
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 3s
+      retries: 30
+
+  wordpress:
+    image: wordpress:${WORDPRESS_TAG:-latest}
+    depends_on:
+      db: { condition: service_healthy }
+    environment: &wpenv
+      WORDPRESS_DB_HOST: db
+      WORDPRESS_DB_USER: wp
+      WORDPRESS_DB_PASSWORD: wp
+      WORDPRESS_DB_NAME: wp
+    volumes: &wpvolumes
+      - wp:/var/www/html
+      - ../..:/var/www/html/wp-content/plugins/caddy-souin-cache-manager:ro
+
+  caddy:
+    # Any Caddy build that includes github.com/caddyserver/cache-handler.
+    image: ${CADDY_IMAGE:-morsalin1342/caddy:latest}
+    depends_on: [wordpress]
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+    ports:
+      - "127.0.0.1:${E2E_HTTP_PORT:-18080}:80"
+      - "127.0.0.1:${E2E_ADMIN_PORT:-12019}:2019"
+
+  cli:
+    image: wordpress:cli
+    profiles: [cli]
+    user: "33:33"
+    environment:
+      <<: *wpenv
+      HOME: /tmp
+    volumes: *wpvolumes
+
+volumes:
+  wp:
