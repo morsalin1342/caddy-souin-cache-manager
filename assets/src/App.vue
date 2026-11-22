@@ -517,7 +517,7 @@ const adjustHeaderPosition = () => {
 };
 
 onMounted(() => {
-  if (currentPage.value === 'keys') fetchKeys();
+  if (currentPage === 'keys') fetchKeys();
   fetchSettings();
 
   // Adjust header on load and on window resize
