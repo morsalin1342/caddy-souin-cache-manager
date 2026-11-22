@@ -15,6 +15,12 @@ use WP_Error;
  * This class serves as the bridge between the Vue.js frontend and the PHP backend.
  */
 class RestApi {
+	/**
+	 * Sent to the browser in place of a saved Redis password. When it comes
+	 * back unchanged the saved password is kept.
+	 */
+	public const PASSWORD_PLACEHOLDER = '__cscm_saved_password__';
+
 	private Api $api;
 	private string $namespace = 'cscm/v1';
 
@@ -206,8 +212,35 @@ class RestApi {
 			'redis_db'       => '0',
 		];
 
-		$settings = array_merge( $defaults, $options );
-		return new WP_REST_Response( $settings, 200 );
+		$settings = array_merge( $defaults, is_array( $options ) ? $options : [] );
+
+		return new WP_REST_Response( self::mask_password( $settings ), 200 );
+	}
+
+	/**
+	 * Replaces the saved Redis password with a placeholder, so the password
+	 * itself never reaches the browser.
+	 */
+	public static function mask_password( array $settings ): array {
+		$is_set                         = isset( $settings['redis_password'] ) && $settings['redis_password'] !== '';
+		$settings['redis_password']     = $is_set ? self::PASSWORD_PLACEHOLDER : '';
+		$settings['redis_password_set'] = $is_set;
+
+		return $settings;
+	}
+
+	/**
+	 * The Redis password to use: the saved one when the placeholder comes
+	 * back, otherwise the submitted value, stored as is (no text
+	 * sanitising, which would strip characters such as "<", "%20" or
+	 * surrounding spaces from a password).
+	 */
+	private static function submitted_password( $submitted, string $saved ): string {
+		if ( $submitted === self::PASSWORD_PLACEHOLDER ) {
+			return $saved;
+		}
+
+		return is_scalar( $submitted ) ? (string) $submitted : '';
 	}
 
 	/**
@@ -218,8 +251,10 @@ class RestApi {
 	 * @return WP_REST_Response A success response containing the updated settings.
 	 */
 	public function update_settings( WP_REST_Request $request ): WP_REST_Response {
-		$params = $request->get_json_params();
+		$params  = $request->get_json_params();
+		$params  = is_array( $params ) ? $params : array();
 		$options = get_option( 'cscm_settings', [] );
+		$options = is_array( $options ) ? $options : array();
 
 		// Sanitize and update each setting.
 		if ( isset( $params['api_url'] ) ) {
@@ -233,12 +268,16 @@ class RestApi {
 		$options['redis_enabled']  = ! empty( $params['redis_enabled'] ) ? '1' : '0';
 		$options['redis_host']     = sanitize_text_field( $params['redis_host'] ?? '127.0.0.1' );
 		$options['redis_port']     = intval( $params['redis_port'] ?? 6379 );
-		$options['redis_password'] = sanitize_text_field( $params['redis_password'] ?? '' );
 		$options['redis_db']       = intval( $params['redis_db'] ?? 0 );
+
+		$saved_password = (string) ( $options['redis_password'] ?? '' );
+		if ( array_key_exists( 'redis_password', $params ) ) {
+			$options['redis_password'] = self::submitted_password( $params['redis_password'], $saved_password );
+		}
 
 		update_option( 'cscm_settings', $options );
 
-		return new WP_REST_Response( array( 'success' => true, 'settings' => $options ), 200 );
+		return new WP_REST_Response( array( 'success' => true, 'settings' => self::mask_password( $options ) ), 200 );
 	}
 
 	/**
@@ -275,13 +314,16 @@ class RestApi {
 	 * @return WP_REST_Response|WP_Error A success response or a WP_Error on failure.
 	 */
 	public function test_redis_connection( WP_REST_Request $request ): WP_REST_Response|WP_Error {
-		$params = $request->get_json_params();
+		$params  = $request->get_json_params();
+		$params  = is_array( $params ) ? $params : array();
+		$options = get_option( 'cscm_settings', [] );
+		$saved   = (string) ( is_array( $options ) ? ( $options['redis_password'] ?? '' ) : '' );
 
 		// Use a temporary RedisClient instance to test the connection.
 		$redis = new RedisClient( [
 			'host'     => $params['redis_host'] ?? '127.0.0.1',
 			'port'     => $params['redis_port'] ?? 6379,
-			'password' => $params['redis_password'] ?? null,
+			'password' => self::submitted_password( $params['redis_password'] ?? '', $saved ),
 			'database' => $params['redis_db'] ?? 0,
 		] );
 
