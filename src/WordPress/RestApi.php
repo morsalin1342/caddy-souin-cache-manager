@@ -153,9 +153,8 @@ class RestApi {
 	 */
 	public function handle_purge( WP_REST_Request $request ): WP_REST_Response|WP_Error {
 		$params = $request->get_json_params();
+		$params = is_array( $params ) ? $params : array();
 		$type   = $params['type'] ?? 'all';
-
-		$result = null;
 
 		switch ( $type ) {
 			case 'all':
@@ -163,11 +162,14 @@ class RestApi {
 				break;
 			case 'keys':
 				$keys = $params['keys'] ?? [];
-				if ( empty( $keys ) ) {
+				if ( empty( $keys ) || ! is_array( $keys ) ) {
 					return new WP_Error( 'no_keys_provided', 'No keys provided for purging.', array( 'status' => 400 ) );
 				}
 				$errors = [];
 				foreach ( $keys as $key ) {
+					if ( ! is_string( $key ) ) {
+						return new WP_Error( 'invalid_key', 'Cache keys must be strings.', array( 'status' => 400 ) );
+					}
 					$purge_result = $this->api->purge_by_key( $key );
 					if ( is_wp_error( $purge_result ) ) {
 						$errors[] = $purge_result->get_error_message();
@@ -180,13 +182,21 @@ class RestApi {
 				break;
 			case 'regex':
 				$regex = $params['regex'] ?? '';
-				if ( empty( $regex ) ) {
+				if ( empty( $regex ) || ! is_string( $regex ) ) {
 					return new WP_Error( 'no_regex_provided', 'No regex pattern provided.', array( 'status' => 400 ) );
 				}
 				$result = $this->api->purge_by_regex( $regex );
+				if ( is_wp_error( $result ) && $result->get_error_code() === 'invalid_regex' ) {
+					$result->add_data( array( 'status' => 400 ) );
+				}
 				break;
+			default:
+				return new WP_Error(
+					'invalid_purge_type',
+					'Unknown purge type. Use "all", "keys" or "regex".',
+					array( 'status' => 400 )
+				);
 		}
-
 
 		if ( is_wp_error( $result ) ) {
 			return $result;

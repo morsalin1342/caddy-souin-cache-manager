@@ -90,4 +90,47 @@ class RestApiTest extends TestCase {
 		$this->save( array( 'redis_password' => array( 'x' ) ) );
 		$this->assertSame( '', $this->stored['redis_password'] );
 	}
+
+	public function test_an_unknown_purge_type_is_a_400(): void {
+		$this->api->shouldNotReceive( 'purge_all' );
+
+		$result = $this->rest->handle_purge( new WP_REST_Request( array( 'type' => 'everything' ) ) );
+
+		$this->assertInstanceOf( WP_Error::class, $result );
+		$this->assertSame( 'invalid_purge_type', $result->get_error_code() );
+		$this->assertSame( array( 'status' => 400 ), $result->get_error_data() );
+	}
+
+	public function test_purge_all_is_the_default(): void {
+		$this->api->shouldReceive( 'purge_all' )->once()->andReturn( true );
+
+		$result = $this->rest->handle_purge( new WP_REST_Request( array() ) );
+
+		$this->assertInstanceOf( WP_REST_Response::class, $result );
+		$this->assertSame( array( 'success' => true ), $result->get_data() );
+	}
+
+	public function test_keys_must_be_a_list_of_strings(): void {
+		$this->api->shouldNotReceive( 'purge_by_key' );
+
+		$this->assertInstanceOf( WP_Error::class, $this->rest->handle_purge( new WP_REST_Request( array( 'type' => 'keys', 'keys' => 'abc' ) ) ) );
+		$this->assertInstanceOf( WP_Error::class, $this->rest->handle_purge( new WP_REST_Request( array( 'type' => 'keys', 'keys' => array( array( 'x' ) ) ) ) ) );
+	}
+
+	public function test_purging_keys_passes_each_key_through(): void {
+		$this->api->shouldReceive( 'purge_by_key' )->with( 'GET-http-a-/' )->once()->andReturn( true );
+		$this->api->shouldReceive( 'purge_by_key' )->with( 'GET-http-a-/?s=x' )->once()->andReturn( true );
+
+		$result = $this->rest->handle_purge( new WP_REST_Request( array( 'type' => 'keys', 'keys' => array( 'GET-http-a-/', 'GET-http-a-/?s=x' ) ) ) );
+
+		$this->assertInstanceOf( WP_REST_Response::class, $result );
+	}
+
+	public function test_an_unsendable_regex_is_a_400(): void {
+		$this->api->shouldReceive( 'purge_by_regex' )->andReturn( new WP_Error( 'invalid_regex', 'nope' ) );
+
+		$result = $this->rest->handle_purge( new WP_REST_Request( array( 'type' => 'regex', 'regex' => '[a-z]' ) ) );
+
+		$this->assertSame( array( 'status' => 400 ), $result->get_error_data() );
+	}
 }
