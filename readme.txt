@@ -1,8 +1,8 @@
 === Caddy Souin Cache Manager ===
 Contributors: morsalin1342
-Tags: caddy, souin, cache, purge, performance, http-cache, caching, reverse-proxy
+Tags: caddy, souin, cache, purge, http-cache
 Requires at least: 5.8
-Tested up to: 6.5
+Tested up to: 7.1
 Requires PHP: 8.1
 Stable tag: 1.8.14
 License: GPLv2 or later
@@ -19,8 +19,8 @@ The Caddy Souin Cache Manager plugin provides seamless integration between your 
 * View all Souin cache keys directly in WP Admin
 * One-click full cache purge
 * Selective purging by key, selection, or regular expression
-* Multiple backends: HTTP API or direct Redis connection
-* Automatic cache invalidation on content updates
+* Optional key search over a direct Redis connection (search only; purging always uses the Souin API)
+* Automatic purge when posts are published, updated, unpublished, trashed or deleted
 * Full WP-CLI integration (`wp souin` commands)
 * All actions protected by WordPress nonces (admin only)
 
@@ -56,4 +56,4 @@ With the example above the plugin's API URL is
 
 == Changelog ==
 
-See `changelog.txt` for the full changelog.
+See `changelog.txt`.
