@@ -214,18 +214,16 @@ See [changelog.txt](changelog.txt).
 
 ## Related Images & Tools
 
-This plugin manages the **Souin** cache, which ships in these two images. Either one gives you
-a Caddy with Souin already compiled in, so the only setup left is enabling the API in your
-Caddyfile.
+<!-- BEGIN GENERATED: related (from catalog.yaml in the morsalin1342/docker-images repository; do not edit by hand) -->
+This plugin manages the **Souin** cache, which ships in these two images. Either one gives you a Caddy with Souin already compiled in, so the only setup left is enabling the API in your Caddyfile.
 
 | Repository | Images | Description |
 |---|---|---|
-| [caddy-docker](https://github.com/morsalin1342/caddy-docker) | `morsalin1342/caddy` · `easydigital/caddy` | Standalone Caddy — Souin with Redis, Otter and SimpleFS backends |
-| [frankenphp-docker](https://github.com/morsalin1342/frankenphp-docker) | `morsalin1342/frankenphp` · `easydigital/frankenphp` | Caddy + PHP app server, same Souin stack compiled in |
+| [caddy-docker](https://github.com/morsalin1342/caddy-docker) | `morsalin1342/caddy` · `ghcr.io/morsalin1342/caddy` | Standalone Caddy — Souin with Redis, Otter and SimpleFS backends |
+| [frankenphp-docker](https://github.com/morsalin1342/frankenphp-docker) | `morsalin1342/frankenphp` · `ghcr.io/morsalin1342/frankenphp` | Caddy + PHP app server, same Souin stack compiled in |
 
-Also in this family, though neither ships Souin:
-[php-docker](https://github.com/morsalin1342/php-docker) (PHP-FPM & CLI) and
-[nginx-docker](https://github.com/morsalin1342/nginx-docker) (nginx with ModSecurity 3, Brotli and GeoIP2).
+Also in this family, though none of them ships Souin: [php-docker](https://github.com/morsalin1342/php-docker), [nginx-docker](https://github.com/morsalin1342/nginx-docker) and [apache-docker](https://github.com/morsalin1342/apache-docker).
+<!-- END GENERATED: related -->
 
 ---
 
