@@ -1,0 +1,12 @@
+# Weekly update pull requests for the actions the workflows use, including the
+# pinned docker-images catalog check.
+version: 2
+updates:
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    groups:
+      github-actions:
+        patterns:
+          - "*"

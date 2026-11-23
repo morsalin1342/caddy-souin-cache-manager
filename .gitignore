@@ -17,3 +17,6 @@
 
 # Log files
 *.log
+
+# PHPUnit
+/.phpunit.cache

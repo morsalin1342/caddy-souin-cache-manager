@@ -5,6 +5,9 @@ on:
     tags:
       - 'v*'
 
+permissions:
+  contents: read
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -13,10 +16,12 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
 
       - name: Set up PHP
-        uses: shivammathur/setup-php@v2
+        uses: shivammathur/setup-php@eb7c497e18156a6bbabfef1d3a82760b9eda3962 # 2.40.0
         with:
           php-version: '8.1'
           extensions: mbstring, dom, xml, xmlwriter, curl, zip, json
@@ -26,14 +31,14 @@ jobs:
         run: composer install --no-dev --prefer-dist --optimize-autoloader
 
       - name: Set up Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version: '22'
           cache: 'npm'
           cache-dependency-path: package-lock.json
 
       - name: Install Node.js dependencies
-        run: npm install
+        run: npm ci
 
       - name: Build frontend assets
         run: npm run build
@@ -41,11 +46,11 @@ jobs:
       - name: Create plugin archive
         run: |
           mkdir caddy-souin-cache-manager
-          rsync -av --progress . caddy-souin-cache-manager --exclude .git --exclude .github --exclude node_modules --exclude assets/src --exclude .idea --exclude *.bak --exclude *.zip
+          rsync -av --progress . caddy-souin-cache-manager --exclude .git --exclude .github --exclude node_modules --exclude assets/src --exclude /tests --exclude /phpunit.xml.dist --exclude /.phpunit.cache --exclude .idea --exclude '*.bak' --exclude '*.zip' --exclude /caddy-souin-cache-manager/
           zip -r caddy-souin-cache-manager.zip caddy-souin-cache-manager
 
       - name: Create GitHub Release
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@8a0cd651e5b2365bd640854a3fa5dfc70e4875f3 # v3.0.4
         with:
           files: caddy-souin-cache-manager.zip
         env:

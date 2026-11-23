@@ -264,7 +264,8 @@
                 </div>
                 <div class="tw:space-y-1.5">
                   <label class="tw:text-[9px] tw:font-bold tw:text-slate-400 tw:uppercase">Password</label>
-                  <input type="password" v-model="settings.redis_password" class="tw:w-full tw:bg-slate-50 tw:border tw:border-slate-200 tw:rounded-lg tw:px-3 tw:py-1.5 tw:text-xs focus:tw:bg-white focus:tw:border-blue-500">
+                  <input type="password" v-model="settings.redis_password" autocomplete="new-password" class="tw:w-full tw:bg-slate-50 tw:border tw:border-slate-200 tw:rounded-lg tw:px-3 tw:py-1.5 tw:text-xs focus:tw:bg-white focus:tw:border-blue-500">
+                  <p v-if="settings.redis_password_set" class="tw:text-slate-400 tw:text-[10px]">A password is saved. Leave it as is to keep it, or clear the field to remove it.</p>
                 </div>
                 <div class="tw:space-y-1.5">
                   <label class="tw:text-[9px] tw:font-bold tw:text-slate-400 tw:uppercase">DB Index</label>
@@ -516,7 +517,7 @@ const adjustHeaderPosition = () => {
 };
 
 onMounted(() => {
-  if (currentPage.value === 'keys') fetchKeys();
+  if (currentPage === 'keys') fetchKeys();
   fetchSettings();
 
   // Adjust header on load and on window resize

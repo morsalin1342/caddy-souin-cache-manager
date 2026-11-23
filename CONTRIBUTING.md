@@ -25,7 +25,7 @@ To get started with development, you'll need to have Node.js, npm, and Composer 
 
 3.  **Install JavaScript dependencies**:
     ```shell
-    npm install
+    npm ci
     ```
 
 4.  **Start the development server**:
@@ -42,19 +42,38 @@ To get started with development, you'll need to have Node.js, npm, and Composer 
 
 ## Running Tests
 
-This project uses PHPUnit for backend testing. To run the tests, use the following command:
+### Unit tests
+
+The PHP code is unit tested with PHPUnit, using [Brain Monkey](https://github.com/Brain-WP/BrainMonkey) to stand in for WordPress functions, so no WordPress install is needed:
 
 ```shell
-./vendor/bin/phpunit
+composer install
+composer test        # or ./vendor/bin/phpunit
+composer lint        # php -l on every PHP file
 ```
 
-Please ensure that all tests are passing before submitting a pull request. If you're adding a new feature, please include tests for it.
+### End-to-end tests
+
+`tests/e2e/run.sh` starts WordPress, MariaDB and Caddy with the Souin cache handler in Docker, caches pages through Caddy, then publishes, unpublishes, trashes and deletes posts with WP-CLI and checks which cache keys are left. It also covers the `wp souin` commands and the settings REST endpoint.
+
+```shell
+composer install
+tests/e2e/run.sh             # tears the stack down when done
+KEEP=1 tests/e2e/run.sh      # leaves it running on http://localhost:18080
+```
+
+It needs Docker with Compose. The Caddy image defaults to `morsalin1342/caddy:latest`; set `CADDY_IMAGE` to use any other Caddy build that includes the cache handler.
+
+### CI
+
+Every push and pull request runs `.github/workflows/ci.yml`: `php -l` and the unit tests on PHP 8.1 to 8.5, `composer audit`, `npm ci` with the asset build, and `npm audit --audit-level=high`. The end-to-end tests are not run in CI; run them locally when you change purging.
+
+Please make sure the tests pass before submitting a pull request, and add tests for new behaviour.
 
 ## Pull Request Process
 
-1.  Ensure any install or build dependencies are removed before the end of the layer when doing a build.
-2.  Update the `README.md` with details of changes to the interface, this includes new environment variables, exposed ports, useful file locations and container parameters.
-3.  Increase the version numbers in any examples and the `README.md` to the new version that this Pull Request would represent. The versioning scheme we use is [SemVer](http://semver.org/).
-4.  You may merge the Pull Request in once you have the sign-off of two other developers, or if you do not have permission to do that, you may request the second reviewer to merge it for you.
+1.  Keep each pull request to one change, and describe how you tested it.
+2.  Update `README.md` when you change behaviour, settings or `wp souin` commands.
+3.  Add an entry to `changelog.txt`. Version numbers are bumped when a release is made.
 
 Thank you for your contribution!

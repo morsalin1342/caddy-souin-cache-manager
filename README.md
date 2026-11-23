@@ -15,8 +15,8 @@ A simple yet powerful plugin to manage the Souin cache for your Caddy web server
 | **See what is cached** | `curl` the Souin API and read raw JSON | ✅ Browsable key list in WP Admin |
 | **Purge one entry** | Hand-built API call with the exact key | ✅ One click, or `wp souin purge-key` |
 | **Purge by pattern** | ❌ Not practical by hand | ✅ Regex purge |
-| **Invalidate on content change** | ❌ Manual, every time | ✅ Automatic on post, page and comment changes |
-| **Redis backend** | Separate tooling | ✅ Direct connection |
+| **Invalidate on content change** | ❌ Manual, every time | ✅ Automatic when posts and pages are published, updated, unpublished, trashed or deleted, and on new comments |
+| **Search keys in Redis** | `redis-cli SCAN` | ✅ Optional key search over a direct Redis connection (search only) |
 | **Automation / CI** | Shell scripts around `curl` | ✅ Full `wp souin` command suite |
 
 ## Description
@@ -35,8 +35,8 @@ It also features intelligent automatic purging, which clears the cache for posts
     *   Purge individual cache items.
     *   Bulk purge selected items.
     *   Purge by a flexible regular expression.
-*   **Multiple Backends:** Connect to the Souin cache via the HTTP API or directly to a Redis backend.
-*   **Automatic Cache Invalidation:** Automatically purges the cache for posts, pages, or comments when they are created, updated, or deleted.
+*   **Optional Redis key search:** If Souin stores its cache in Redis, the plugin can search keys there directly. This is search only: listing and purging always go through the Souin API.
+*   **Automatic Cache Invalidation:** Purges a post's cached pages when it is published, updated, unpublished (moved to draft, pending or private), trashed or deleted, and when its comment count changes. See [How automatic purging works](#how-automatic-purging-works).
 *   **WP-CLI Integration:** A full suite of `wp souin` commands for power users and automation.
 *   **Secure:** All actions are protected by WordPress nonces and require administrator privileges (`manage_options` capability).
 *   **Lightweight & Compatible:** The plugin is designed to be developer-friendly and makes no assumptions about your cache key structure, making it compatible with a wide range of Caddy and Souin configurations.
@@ -79,18 +79,20 @@ This plugin provides a full suite of WP-CLI commands for managing the Souin cach
 
 #### `wp souin status`
 
-Displays the current plugin configuration and tests the connection to the Souin API.
+Displays the current plugin configuration and tests the connection to the Souin API with a `GET` request. It exits with status 1 when the API cannot be reached, so it can be used in scripts.
 
 ```shell
 $ wp souin status
-+-------------------+------------------------------------------+
-| Key               | Value                                    |
-+-------------------+------------------------------------------+
-| Souin API URL     | http://127.0.0.1:2019/souin-api/souin      |
-| Auto Purge        | Enabled                                  |
-| API Connection    | Connection successful! Found 42 keys.    |
-+-------------------+------------------------------------------+
++----------------+---------------------------------------+
+| Key            | Value                                 |
++----------------+---------------------------------------+
+| Souin API URL  | http://127.0.0.1:2019/souin-api/souin |
+| Auto Purge     | Enabled                               |
+| API Connection | OK, 42 keys cached                    |
++----------------+---------------------------------------+
 ```
+
+If the API cannot be reached, the last row reads `FAILED: <reason>` and the command ends with `Error: Could not reach the Souin API at <url>.`
 
 #### `wp souin list`
 
@@ -112,8 +114,8 @@ Purges the entire Souin cache. A confirmation prompt will be shown before procee
 
 ```shell
 $ wp souin purge-all
-Are you sure you want to purge the entire Souin cache? [y/n] y
-Success: The entire Souin cache has been purged.
+Are you sure you want to purge the entire cache? [y/n] y
+Success: Souin cache completely purged.
 ```
 
 To bypass the confirmation prompt, use the `--yes` flag:
@@ -123,7 +125,7 @@ $ wp souin purge-all --yes
 
 #### `wp souin purge-key <key>...`
 
-Purges one or more specific keys from the cache. You can pass multiple keys separated by spaces.
+Purges one or more specific keys from the cache. You can pass multiple keys separated by spaces. Pass the keys exactly as `wp souin list` shows them; purging a key also purges its `{-VARY-}` variants. The command exits with status 1 if any key could not be purged.
 
 ```shell
 # Purge a single key
@@ -135,12 +137,32 @@ $ wp souin purge-key "KEY-GET-https-example.com-/" "KEY-GET-https-example.com-/a
 
 #### `wp souin purge-regex <pattern>`
 
-Purges all cache keys that match a given regular expression pattern. The pattern should be a valid PCRE expression.
+Purges all cache keys that match a given regular expression pattern. Souin matches the pattern anywhere in the key.
 
 **Example: Purge all keys related to a specific product page**
 ```shell
-$ wp souin purge-regex ".*\/product\/cool-widget\/.*"
+$ wp souin purge-regex ".*/product/cool-widget/.*"
 ```
+
+Souin reads the pattern straight from the request URL and does not decode it, while the WordPress HTTP API percent-encodes some characters. So not every regex can be sent:
+
+*   Character classes (`[a-z]`), counted repeats (`{2}`), alternation (`|`) and escapes such as `\d` are refused with an error.
+*   Escaped characters such as `\/` or `\.` are accepted; `\.` and other escaped operators are sent as `.`, which matches any one character.
+*   A leading `^` is dropped.
+
+## How automatic purging works
+
+When a post or page (or any public post type) changes, the plugin collects the affected URLs and purges them once, when WordPress finishes handling the request:
+
+| Change | Purged |
+|---|---|
+| Published, updated while published, slug changed | The post (old and new URL), home page, posts page and its pagination, feed, category/tag archives, author archive, post type archive |
+| Unpublished (to draft, pending, private or scheduled), trashed, deleted | The same pages, using the URL the post had while it was published |
+| Comment count changed on a published post | The same pages |
+
+The post's own URL is purged together with everything below it (`/hello-world/feed/`, `/hello-world/?amp=1` and so on); the home page is purged on its own, so search results and other query strings are left alone.
+
+Automatic purging assumes Souin's default key layout, `METHOD-scheme-host-/path?query`, where the path follows a `-`. If you use a custom Souin key template, purge manually or with `wp souin purge-regex`.
 
 ## ❓ FAQ
 
@@ -184,34 +206,24 @@ Yes. All purge actions are protected with WordPress nonces and require the `mana
 
 **Will this work with any cache key format?**
 
-Yes. The plugin sends the literal, unmodified cache key for all manual purge operations, making it compatible with any key structure Souin might use. The automatic purge feature uses a broad regex pattern to ensure all variants of a URL are purged.
+Manual purges work with any key: the plugin turns the key you pick into a pattern that matches it. Characters that cannot travel through the WordPress HTTP API unchanged (`?`, `{`, `%` and so on) are sent as `.`, so a purge can occasionally also remove a key that differs from it in exactly those positions, but it never misses the key itself. Automatic purging assumes the default key layout described in [How automatic purging works](#how-automatic-purging-works).
 
 ## Changelog
 
-### 1.8.14
-*   **Fix**: Implemented a dynamic header positioning script to prevent the sticky header from overlapping with WordPress admin notices.
-*   **Fix**: Removed the footer credit line and added vertical margin to the main content area for better spacing.
-
-### 1.8.13
-*   Complete architecture refactor.
-*   New Vue.js powered admin interface.
-*   Tailwind CSS v4 integration.
-*   REST API support.
+See [changelog.txt](changelog.txt).
 
 ## Related Images & Tools
 
-This plugin manages the **Souin** cache, which ships in these two images. Either one gives you
-a Caddy with Souin already compiled in, so the only setup left is enabling the API in your
-Caddyfile.
+<!-- BEGIN GENERATED: related (from catalog.yaml in the morsalin1342/docker-images repository; do not edit by hand) -->
+This plugin manages the **Souin** cache, which ships in these two images. Either one gives you a Caddy with Souin already compiled in, so the only setup left is enabling the API in your Caddyfile.
 
 | Repository | Images | Description |
 |---|---|---|
-| [caddy-docker](https://github.com/morsalin1342/caddy-docker) | `morsalin1342/caddy` · `easydigital/caddy` | Standalone Caddy — Souin with Redis, Otter and SimpleFS backends |
-| [frankenphp-docker](https://github.com/morsalin1342/frankenphp-docker) | `morsalin1342/frankenphp` · `easydigital/frankenphp` | Caddy + PHP app server, same Souin stack compiled in |
+| [caddy-docker](https://github.com/morsalin1342/caddy-docker) | `morsalin1342/caddy` · `ghcr.io/morsalin1342/caddy` | Standalone Caddy — Souin with Redis, Otter and SimpleFS backends |
+| [frankenphp-docker](https://github.com/morsalin1342/frankenphp-docker) | `morsalin1342/frankenphp` · `ghcr.io/morsalin1342/frankenphp` | Caddy + PHP app server, same Souin stack compiled in |
 
-Also in this family, though neither ships Souin:
-[php-docker](https://github.com/morsalin1342/php-docker) (PHP-FPM & CLI) and
-[nginx-docker](https://github.com/morsalin1342/nginx-docker) (nginx with ModSecurity 3, Brotli and GeoIP2).
+Also in this family, though none of them ships Souin: [php-docker](https://github.com/morsalin1342/php-docker), [nginx-docker](https://github.com/morsalin1342/nginx-docker) and [apache-docker](https://github.com/morsalin1342/apache-docker).
+<!-- END GENERATED: related -->
 
 ---
 
